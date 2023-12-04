@@ -23,7 +23,7 @@ public class IRoadTrip {
     public static int [][] dist ;
     public static int [] numaA ;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { // NEEDS FIX
         IRoadTrip a3 = new IRoadTrip(args);
 
         // a3.execute();
