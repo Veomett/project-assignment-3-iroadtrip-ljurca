@@ -21,8 +21,8 @@ public class IRoadTrip {
     public static void main(String[] args) {
         IRoadTrip a3 = new IRoadTrip(args);
         a3.findPath("China", "South Africa") ;
-        System.out.println(getDistance("Canada","")) ;
-        a3.acceptUserInput();
+        System.out.println(getDistance("Mexico","United States")) ;
+        //a3.acceptUserInput();
 
     }
 
@@ -40,7 +40,6 @@ public class IRoadTrip {
             doFile0( sc0,line0,countries );
             File state_name = new File(args[1]);
             Scanner sc1 = new Scanner( state_name );
-           // int n1 =
             doFile1( sc1);
             File capdist = new File(args[2]);
             Scanner sc2 = new Scanner( capdist );
@@ -54,11 +53,9 @@ public class IRoadTrip {
 
     public void execute(){
 
-        /*-------------------------------------------------------------------*/
-        /* initializing four arrays
-        /*-------------------------------------------------------------------*/
+       /* SORT ARRAYS */
         sort0();				// bubble alphabetical order, enable binary search
-        sort1( distances );				// enable binary search
+        sort1();		// enable binary search
 
         /*-------------------------------------------------------------------*/
         /* making array of adjacency lists for graph
@@ -67,7 +64,7 @@ public class IRoadTrip {
         // adjList array: the index corresponds to index of country in borders.txt
         //	the entries are the index of the country's neighbor and their distance,
         // and then a pointer to the next adjacent country
-        adjListA = new AdjList [NumCountries]; //n0: num of countries from dofile0
+        adjListA = new AdjList [NumCountries];
         for ( int i = 0;  i < NumCountries;  i++ ) {
             // the index of the countries next to afghanistan, in case of line0[0]
             int [] nabor = nextTo( line0[i] );
@@ -86,11 +83,12 @@ public class IRoadTrip {
     }
     public static int getDistance (String country1, String country2) {
         Trip t = new Trip( countries, distances, adjListA, numA_Arr) ;
-       int n1 = index(country1) ;
-       int n2 = index(country2) ;
-       gNode p = adjListA[n1].head ;
+
+       int c1 = index(country1) ;
+       int c2 = index(country2) ;
+       gNode p = adjListA[c1].head ;
        while(p != null){
-           if(p.vrtx == n2){
+           if(p.vrtx == c2){
                return(t.distance(country1,country2)) ;
            }
            p = p.link ;
@@ -114,6 +112,7 @@ public class IRoadTrip {
     public void acceptUserInput() {
         Trip trip = new Trip( countries,distances,adjListA,numA_Arr);
         Scanner kbd = new Scanner( System.in );
+
         while ( true ) {
             System.out.print( "Enter the name of the  first "+
                     "country (type EXIT to quit): " );
@@ -185,41 +184,6 @@ public class IRoadTrip {
         // make sure its the right country in dist. then, return the dist.
         // dist[0] == country1 , dist[1] == country 2, dist[2] == distance between them
     }
-    private int [][] findMinPaths( AdjList [] adjListA,int s ) {
-
-        int n = adjListA.length;
-        Integer [] dist = new Integer [n];
-        Integer [] prev = new Integer [n];
-        Queue queue = new Queue();
-        for ( int v = 0;  v < n;  v++ ) {
-            dist[v] = Integer.MAX_VALUE;	// infinity
-            prev[v] = -1;			// "parent" of v
-        }
-        dist[s] = 0;
-        for ( int v = 0;  v < n;  v++ ) {
-            queue.add( new qNode( v,dist[v] ) );
-        }
-        while ( queue.isNotDone() ) {
-            int u = queue.deleteMin();
-            for ( gNode p = adjListA[u].Head();  p != null;
-                  p = p.link ) {
-                int v = p.vrtx;
-                int newDist = dist[u]+p.wght;
-                if ( newDist < dist[v] ) {
-                    dist[v] = newDist;
-                    prev[v] = u;
-                    queue.decrease( v,newDist );
-                }
-            }
-        }
-        int [][] minPath = new int [n][n];
-        for ( int v = 0;  v < n;  v++ ) {
-            minPath[v][0] = dist[v];
-            minPath[v][1] = prev[v];
-        }
-        return( minPath );
-    }
-
 
     private static String getname1( String s ) {
 
@@ -309,7 +273,7 @@ public class IRoadTrip {
         return( (s.equals( countries[t] ) ? t : -1) );
     }
 
-    private static void sort0( ) {	// bubble sort to put countries in alphabetical order
+    private static void sort0() {	// bubble sort to put countries in alphabetical order
 
         int n = IRoadTrip.stateNums.length;
         for ( int i = 1;  i < n;  i++ ) {
@@ -326,7 +290,7 @@ public class IRoadTrip {
         }
     }
 
-    private static void sort1( int [][] dist ) {
+    private static void sort1() {
         // sort each block `
 
         int a,b,i,j,k,n,x;
@@ -338,13 +302,13 @@ public class IRoadTrip {
             b = (i != 64 ? a+201 : a+403);
             for ( j = 1;  j < b-a+1;  j++ ) {
                 for ( k = 0;  k < b-a+1-j;  k++ ) {
-                    if ( dist[a+k+1][1] < dist[a+k][1] ) {
-                        x = dist[a+k][1];
-                        dist[a+k][1] = dist[a+k+1][1];
-                        dist[a+k+1][1] = x;
-                        x = dist[a+k][2];
-                        dist[a+k][2] = dist[a+k+1][2];
-                        dist[a+k+1][2] = x;
+                    if ( distances[a+k+1][1] < distances[a+k][1] ) {
+                        x = distances[a+k][1];
+                        distances[a+k][1] = distances[a+k+1][1];
+                        distances[a+k+1][1] = x;
+                        x = distances[a+k][2];
+                        distances[a+k][2] = distances[a+k+1][2];
+                        distances[a+k+1][2] = x;
                     }
                 }
             }
@@ -595,7 +559,7 @@ public class IRoadTrip {
             return( find( numa,numb ) );
         }
 
-        private void explore( int v,
+        public void explore( int v,
                               Boolean [] visited ) {
 
             // explore everything that is visible from v.
@@ -612,7 +576,7 @@ public class IRoadTrip {
             }
         }
 
-        private int find( int numa,int numb ) {
+        public int find( int numa,int numb ) {
 
             int b,m,t;
 
@@ -640,7 +604,7 @@ public class IRoadTrip {
             // impossible dist
         }
 
-        private int [][] findMinPaths( int s ) {
+        public int [][] findMinPaths( int s ) {
 
             int n = adjListA.length;
             Integer [] dist = new Integer [n];
@@ -976,18 +940,13 @@ public class IRoadTrip {
         while ( sc.hasNextLine() ) {
             s = sc.nextLine();
             if ( !s.equals( newFile[n] ) ) {
-                //System.out.println(s); // PRINT
                 s = newFile[n];
-                //countryDist.put("country", s.substring('=', s.length())) ;
-                // System.out.println(countryDist) ;
             }
             line[n] = s; // s is the string, and line is the actual line used
             country[n++] = s.substring( 0,
                     s.indexOf( '=' )-1 ); // n = the number of countries, left of the = sign
         }
         sc.close();
-        // System.out.println(countryDist) ;
-        // return( n );
     }
 
     private static void doFile1( Scanner sc ) {
@@ -1217,8 +1176,6 @@ public class IRoadTrip {
         while ( sc.hasNextLine() ) {
             s = sc.nextLine();
             if ( !s.equals( newFile[n] ) ) {
-                //System.out.println(newFile[n]);
-                // System.out.println(s); // PRINT
                 s = newFile[n];
             }
             //snum = country name and country number
@@ -1282,9 +1239,6 @@ public class IRoadTrip {
             }
             sc2.close();
             fin.delete();
-
-            //n2i[0] = n2;
-            //n2i[1] = ni;
 
         } catch( Exception e ) {
             System.out.println( "doFile2: ** I/O exception **" );
