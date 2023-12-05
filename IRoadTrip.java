@@ -41,7 +41,7 @@ public class IRoadTrip {
             File state_name = new File(args[1]);
             Scanner sc1 = new Scanner( state_name );
            // int n1 =
-            doFile1( sc1,stateNums);
+            doFile1( sc1);
             File capdist = new File(args[2]);
             Scanner sc2 = new Scanner( capdist );
             doFile2( sc2,numA_Arr, distances);
@@ -57,7 +57,7 @@ public class IRoadTrip {
         /*-------------------------------------------------------------------*/
         /* initializing four arrays
         /*-------------------------------------------------------------------*/
-        sort0( stateNums );				// bubble alphabetical order, enable binary search
+        sort0();				// bubble alphabetical order, enable binary search
         sort1( distances );				// enable binary search
 
         /*-------------------------------------------------------------------*/
@@ -73,13 +73,12 @@ public class IRoadTrip {
             int [] nabor = nextTo( line0[i] );
             adjListA[i] = new AdjList();
             if ( nabor[0] != -2 ) { // if there is a neighbor
-                for ( int j = 0;  j < nabor.length;  j++ ) { // for every neighboring country
-                    int x = nabor[j];
-                    int y = distance( countries[i],
-                            countries[nabor[j]],numA_Arr,distances ); // distance between each neighbor and country[i]
-                    if ( y != -1 ) { // distance exists
+                for (int x : nabor) { // for every neighboring country
+                    int y = distance(countries[i],
+                            countries[x], numA_Arr, distances); // distance between each neighbor and country[i]
+                    if (y != -1) { // distance exists
                         adjListA[i].
-                                add( new gNode( x,y ) ); // add the new "graph" gnode to the adjacency list array
+                                add(new gNode(x, y)); // add the new "graph" gnode to the adjacency list array
                     }
                 }
             }
@@ -105,10 +104,9 @@ public class IRoadTrip {
 
         List<String> roadPath = t.findPath( country1,country2 );
         System.out.println( "Route from "+country1+" to "+country2+":" );
-        for ( int i = 0;  i < roadPath.size();  i++ ) {
-            System.out.println( roadPath.get( i ) );
+        for (String s : roadPath) {
+            System.out.println(s);
         }
-
         return t.findPath(country1, country2) ;
     }
 
@@ -138,8 +136,8 @@ public class IRoadTrip {
             }
             List<String> roadPath = trip.findPath( x,y );
             System.out.println( "Route from "+x+" to "+y+":" );
-            for ( int i = 0;  i < roadPath.size();  i++ ) {
-                System.out.println( roadPath.get( i ) );
+            for (String s : roadPath) {
+                System.out.println(s);
             }
         }
         kbd.close();
@@ -272,9 +270,7 @@ public class IRoadTrip {
             s = s.substring( i );
         }
         int [] y = new int [n];
-        for ( int i = 0;  i < n;  i++ ) {
-            y[i] = x[i];
-        }
+        System.arraycopy(x, 0, y, 0, n);
         return( y );
     }
 
@@ -292,7 +288,7 @@ public class IRoadTrip {
                 b = m+1;
             }
         }
-        return( Integer.valueOf( stateNums[t][1] ) );
+        return( Integer.parseInt( stateNums[t][1] ) );
     }
 
 
@@ -313,18 +309,18 @@ public class IRoadTrip {
         return( (s.equals( countries[t] ) ? t : -1) );
     }
 
-    private static void sort0( String [][] a ) {	// bubble sort to put countries in alphabetical order
+    private static void sort0( ) {	// bubble sort to put countries in alphabetical order
 
-        int n = a.length;
+        int n = IRoadTrip.stateNums.length;
         for ( int i = 1;  i < n;  i++ ) {
             for ( int j = 0;  j < n-i;  j++ ) {
-                if ( a[j+1][0].compareTo( a[j][0] ) < 0  ) {
-                    String s = a[j][0];
-                    a[j][0] = a[j+1][0];
-                    a[j+1][0]= s;
-                    s = a[j][1];
-                    a[j][1] = a[j+1][1];
-                    a[j+1][1] = s;
+                if ( IRoadTrip.stateNums[j+1][0].compareTo( IRoadTrip.stateNums[j][0] ) < 0  ) {
+                    String s = IRoadTrip.stateNums[j][0];
+                    IRoadTrip.stateNums[j][0] = IRoadTrip.stateNums[j+1][0];
+                    IRoadTrip.stateNums[j+1][0]= s;
+                    s = IRoadTrip.stateNums[j][1];
+                    IRoadTrip.stateNums[j][1] = IRoadTrip.stateNums[j+1][1];
+                    IRoadTrip.stateNums[j+1][1] = s;
                 }
             }
         }
@@ -333,9 +329,8 @@ public class IRoadTrip {
     private static void sort1( int [][] dist ) {
         // sort each block `
 
-        int a,b,i,j,k,m,n,x;
+        int a,b,i,j,k,n,x;
 
-        m = dist.length;		// number of distance lines
         n = 202;			// number of blocks-1, 203 countries so each country 202 slots
         for ( i = 0;  i < n;  i++ ) {
             // determines when blocks start and end
@@ -531,15 +526,6 @@ public class IRoadTrip {
             return( u );
         }
 
-        private void display() {
-
-            System.out.print( "-- queue =" );
-            for ( qNode p = head;  p != null;  p = p.flink ) {
-                System.out.format( " (%d %d)",p.vrtx,p.dist );
-            }
-            System.out.println( " --" );
-        }
-
         private Boolean isNotDone() {
 
             return( (head != null ) &&
@@ -692,7 +678,7 @@ public class IRoadTrip {
 
         public List<String> findPath( String country1,String country2 ) {
 
-            List<String> y = new ArrayList<String>();
+            List<String> y = new ArrayList<>();
             int v0 = index( country1 );
             int v1 = index( country2 );
             if ( noPath( v0,v1,adjListA ) ) {
@@ -722,11 +708,9 @@ public class IRoadTrip {
 
             int n = adjListA.length;
             Boolean [] visited = new Boolean [n];
-            for ( int i = 0;  i < n;  i++ ) {
-                visited[i] = false;
-            }
+            Arrays.fill(visited, false);
             explore( v0,visited );
-            return( (visited[v1] == false) );
+            return( (!visited[v1]) );
         }
 
     }
@@ -987,7 +971,7 @@ public class IRoadTrip {
                 "Zambia = Angola 1,065 km; Botswana 0.15 km; Congo, Democratic Republic of the 2,332 km; Malawi 847 km; Mozambique 439 km; Namibia 244 km; Tanzania 353 km; Zimbabwe 763 km",
                 "Zimbabwe = Botswana 834 km; Mozambique 1,402 km; South Africa 230 km; Zambia 763 km"};
 
-        String s = new String( "" );
+        String s;
         int n = 0;
         while ( sc.hasNextLine() ) {
             s = sc.nextLine();
@@ -1006,7 +990,7 @@ public class IRoadTrip {
         // return( n );
     }
 
-    private static int doFile1( Scanner sc,String [][] snum ) {
+    private static void doFile1( Scanner sc ) {
 
         String [] newFile = {
                 "statenumber	stateid	countryname	start	end",
@@ -1227,26 +1211,23 @@ public class IRoadTrip {
                 "940	SOL	Solomon Islands	1978-07-07	2020-12-31",
                 "950	FJI	Fiji	1970-10-10	2020-12-31"};
 
-        String s = new String( "" );
+        String s;
         s = sc.nextLine();		// skip first line, it is the name of the categories
         int n = 0;
-        int count = 0 ;
         while ( sc.hasNextLine() ) {
             s = sc.nextLine();
             if ( !s.equals( newFile[n] ) ) {
                 //System.out.println(newFile[n]);
                 // System.out.println(s); // PRINT
-                count++ ;
                 s = newFile[n];
             }
             //snum = country name and country number
-            snum[n][0] = getname1( s ); // index 0 :country name
+            IRoadTrip.stateNums[n][0] = getname1( s ); // index 0 :country name
             // increment n here
-            snum[n++][1] = s.substring( 0,s.indexOf( '\t' ) ); // index 1 is state number
+            IRoadTrip.stateNums[n++][1] = s.substring( 0,s.indexOf( '\t' ) ); // index 1 is state number
         }
         //System.out.println(count); // PRINT
         sc.close();
-        return( n );
     }
     private static void doFile2( Scanner sc,
                                    int [] numA_Arr,int [][] distances ) {
@@ -1255,28 +1236,26 @@ public class IRoadTrip {
         try {
             FileWriter f = new FileWriter( "newcapd.csv" );
             // moved blocks for more order
-            writef( sc,f,3031,202,202 );
-            writef( sc,f,8888,202,606 );
-            writef( sc,f,23028,202,202 );
+            writef( sc,f,3031, 202 );
+            writef( sc,f,8888, 606 );
+            writef( sc,f,23028, 202 );
             while ( sc.hasNextLine() ) {
                 f.write( sc.nextLine()+"\n" );
             }
             f.close();
             File fin = new File( "newcapd.csv" );
             Scanner sc2 = new Scanner( fin );
-            String s = new String( "" );
+            String s;
             s = sc2.nextLine();		// skip first line
             // intializing
             int index = 0;
-            int l = -1;
             int n2 = 0; // number of lines
             int ni = 0;
             while ( sc2.hasNextLine() ) {
-                l++;
                 s = sc2.nextLine();
                 int j = s.indexOf( ',' );
                 // a = state number as an int
-                int a = Integer.valueOf( s.substring( 0,j ) );
+                int a = Integer.parseInt( s.substring( 0,j ) );
                 // tempd = temporary dist, array representing distance between two countries
                 // temp[n2][0] = numid of the first country
                 distances[n2][0] = a;
@@ -1289,7 +1268,7 @@ public class IRoadTrip {
                 s = s.substring( j+1 );
                 j = s.indexOf( ',' );
                 // temp[n2][1] = id of the second country
-                distances[n2][1] = Integer.valueOf( s.
+                distances[n2][1] = Integer.parseInt( s.
                         substring( 0,j ) );
                 s = s.substring( j+1 );
                 j = s.indexOf( ',' );
@@ -1298,7 +1277,7 @@ public class IRoadTrip {
                 // temp[n2][2] = km in dist
                 // increment n
                 // n tells us how many lines have been processed so far
-                distances[n2++][2] = Integer.valueOf( s.
+                distances[n2++][2] = Integer.parseInt( s.
                         substring( 0,j ) );
             }
             sc2.close();
@@ -1314,15 +1293,15 @@ public class IRoadTrip {
         //return( n2i );		// returning two values
     }
 
-    private static void writef( Scanner sc,FileWriter f,
-                                int n1,int n2,int n3 ) {
+    private static void writef(Scanner sc, FileWriter f,
+                               int n1, int n3 ) {
 
         try {
             FileWriter t = new FileWriter( "temptemp" );
             for ( int i = 0;  i < n1;  i++ ) {
                 f.write( sc.nextLine()+"\n" );
             }
-            for ( int i = 0;  i < n2;  i++ ) {
+            for (int i = 0; i < block; i++ ) {
                 t.write( sc.nextLine()+"\n" );
             }
             t.close();
