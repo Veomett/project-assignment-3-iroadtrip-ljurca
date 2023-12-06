@@ -73,5 +73,16 @@ deleteMin(): Called by findMinPath(). The node with the minimum distance is alwa
 
 isNotDone(): Called by findMinPath(). This method checks to see if the algorithm is complete. If the distance in the head node is not the infinite value, the queue still holds more neighbors, and is not done. 
 
-# 
+# Trip Class / Methods()
+A new trip instance is created when a new trip begins.
 
+noPath(): This method checks to see if there is a path between two vertices. It uses the explore() method to see if it is possible to reach a vertex from another. 
+
+explore(): This is a recursive function that checks to see if a vertex can be reached by another vertex. 
+
+path(): Calls the findMinPath() function, and returns the minimum path between two countries in an Array List of strings. If the vertex of country1 or country2 is invalid, an empty list is returned (as well as if there is no path). Otherwise, the path() method "unwinds" the array returned by findMinPaths. Afterwards, the true minimum path is found and it can be added to the Array List. 
+
+findMinPaths(): This method implements Dijkstra's algorithm to find the shortest path between two vertices. An array is created, where dist[v] will represent the distance from vertex s to vertex v. The entire array is intialized to infinity, so every vertex at this point is an infinte distance away from s. However, dist[s] is 0, because a vertex is always 0 _ away from itself. Thus, this will automatically make this node at the front of the queue. 
+  An int u will be used to represent the vertex which was previouisly the min, and we add this node's weight to an int newDist. In the beginning, it will be 0. Next, we search through every vertex v which is adjacent to u and repeat this process. If we find a new distance which is shorter than dist[v], we update dist[v]. At the end, we return an array with the minimum path. 
+
+Distance(): This method searches a block in the distance array (from capdist.csv) to find the distance between two countries. It uses a binary search to first find the block wehre country1 lives, and then to find the line in the block where country2 lives. Then, the third column, which has the distance in km, is returned (if exists). 
