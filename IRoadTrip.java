@@ -663,6 +663,8 @@ public class IRoadTrip {
         }
 
     }
+
+    /* DOFILE0: processes border.txt file and fills in country[] */
     private static void doFile0( Scanner sc,String [] line,String [] country ) {
 
         String [] newFile = {
@@ -934,6 +936,7 @@ public class IRoadTrip {
         sc.close();
     }
 
+    /* DOFILE1: processes state_name.tsv and fills in stateNums[][] */
     private static void doFile1( Scanner sc ) {
 
         String [] newFile = {
@@ -1163,18 +1166,17 @@ public class IRoadTrip {
             if ( !s.equals( newFile[n] ) ) {
                 s = newFile[n];
             }
-            //snum = country name and country number
-            IRoadTrip.stateNums[n][0] = getname1( s ); // index 0 :country name
+            IRoadTrip.stateNums[n][0] = getname1( s ); // index0: country name
             // increment n here
-            IRoadTrip.stateNums[n++][1] = s.substring( 0,s.indexOf( '\t' ) ); // index 1 is state number
+            IRoadTrip.stateNums[n++][1] = s.substring( 0,s.indexOf( '\t' ) ); // index1: state number
         }
-        //System.out.println(count); // PRINT
         sc.close();
     }
+
+    /* DOFILE2: processes capdist.csv by making a temp file and moving blocks around. Completes distances[][] */
     private static void doFile2( Scanner sc,
                                    int [] numA_Arr,int [][] distances ) {
 
-        // int [] n2i = new int [2];
         try {
             FileWriter f = new FileWriter( "newcapd.csv" );
             // moved blocks for more order
@@ -1196,10 +1198,7 @@ public class IRoadTrip {
             while ( sc2.hasNextLine() ) {
                 s = sc2.nextLine();
                 int j = s.indexOf( ',' );
-                // a = state number as an int
                 int a = Integer.parseInt( s.substring( 0,j ) );
-                // tempd = temporary dist, array representing distance between two countries
-                // temp[n2][0] = numid of the first country
                 distances[n2][0] = a;
                 if ( index < a ) {
                     index = a;
@@ -1209,16 +1208,12 @@ public class IRoadTrip {
                 j = s.indexOf( ',' );
                 s = s.substring( j+1 );
                 j = s.indexOf( ',' );
-                // temp[n2][1] = id of the second country
                 distances[n2][1] = Integer.parseInt( s.
                         substring( 0,j ) );
                 s = s.substring( j+1 );
                 j = s.indexOf( ',' );
                 s = s.substring( j+1 );
                 j = s.indexOf( ',' );
-                // temp[n2][2] = km in dist
-                // increment n
-                // n tells us how many lines have been processed so far
                 distances[n2++][2] = Integer.parseInt( s.
                         substring( 0,j ) );
             }
@@ -1229,9 +1224,9 @@ public class IRoadTrip {
             System.out.println( "doFile2: ** I/O exception **" );
             System.exit(0 );
         }
-        //return( n2i );		// returning two values
     }
 
+    /* WRITEF(): writes corrected capdist.csv information into temp file */
     private static void writef(Scanner sc, FileWriter f,
                                int n1, int n3 ) {
 
