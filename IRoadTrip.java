@@ -674,8 +674,8 @@ public class IRoadTrip {
 
     }
 
-    /* DOFILE0: processes border.txt file and fills in country[] */
-    private static void doFile0( Scanner sc,String [] line,String [] country ) {
+    /* DOFILE0: processes borders.txt file and fills in country[] */
+    private static void doFile0( Scanner sc,String [] line,String [] countries ) {
 
         // edited border.txt
         String [] newFile = {
@@ -941,7 +941,7 @@ public class IRoadTrip {
                 s = newFile[n];
             }
             line[n] = s; // s is the string, and line is the actual line used
-            country[n++] = s.substring( 0,
+            countries[n++] = s.substring( 0,
                     s.indexOf( '=' )-1 ); // n = the number of countries, left of the = sign
         }
         sc.close();
@@ -1178,9 +1178,9 @@ public class IRoadTrip {
             if ( !s.equals( newFile[n] ) ) {
                 s = newFile[n];
             }
-            IRoadTrip.stateNums[n][0] = getname1( s ); // index0: country name
+            IRoadTrip.stateNums[n][0] = getname1( s ); // col0: country name
             // increment n here
-            IRoadTrip.stateNums[n++][1] = s.substring( 0,s.indexOf( '\t' ) ); // index1: state number
+            IRoadTrip.stateNums[n++][1] = s.substring( 0,s.indexOf( '\t' ) ); // col1: state number
         }
         sc.close();
     }
