@@ -5,7 +5,9 @@ This is a program written in Java which finds the shortest path to get from one 
 # This program is split into 3 parts: 
 - Processing the files
 - Creating the adjacency list
-- Finding the shortest path using Dijkastra's algorithm. 
+- Finding the shortest path using Dijkastra's algorithm.
+
+# Processing the Files
 
 This program requires 3 files: borders.txt, state_name.tsv, and capdist.csv. 
 
@@ -48,7 +50,7 @@ nextTo(): This method returns an array of all the countries adjacent to s, the c
 
 num(): This method returns the state number found in stateNums, using binary search. It returns the state number as an int. 
 
-# gNode Class
+# Creating the Adjacency List: gNode Class
 A gNode is a single node, or a "Graph Node". Each node has a vertx (vrtx) which is the index the country is in borders.txt. The weight (wght) is the distance in km. It then has a pointer to the next node. 
 
 # AdjList Class / Method
@@ -78,7 +80,7 @@ deleteMin(): Called by findMinPath(). The node with the minimum distance is alwa
 
 isNotDone(): Called by findMinPath(). This method checks to see if the algorithm is complete. If the distance in the head node is not the infinite value, the queue still holds more neighbors, and is not done. 
 
-# Trip Class / Methods()
+# Using Dijkastra's Algorithm: Trip Class / Methods()
 A new trip instance is created when a new trip begins.
 
 noPath(): This method checks to see if there is a path between two vertices. It uses the explore() method to see if it is possible to reach a vertex from another. 
