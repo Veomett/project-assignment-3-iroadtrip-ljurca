@@ -2,7 +2,10 @@
 
 This is a program written in Java which finds the shortest path to get from one country to another. Dijkastra's algorithm was utilized in order to find this minimum path. The findMinPath() method in this program was inspired by the implementation of Dijkastra's algorithm in the book "Algorithms", by Sanjoy Dasgupta, Christos Papadimitriou, and Umesh Vazirani. 
 
-# This program is split into 3 parts: processing the files, creating the adjacency list, and finding the shortest path using Dijkastra's algorithm. 
+# This program is split into 3 parts: 
+- Processing the files
+- Creating the adjacency list
+- Finding the shortest path using Dijkastra's algorithm. 
 
 This program requires 3 files: borders.txt, state_name.tsv, and capdist.csv. 
 
