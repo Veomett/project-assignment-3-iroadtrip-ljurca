@@ -14,7 +14,7 @@ public class IRoadTrip {
     public static String [] countries = new String [NumCountries];	// country names
     final private static String [][] stateNums = new String [NumStates][2];	// state name, state number
     public static String [] line0 = new String [NumCountries];	// line from file0, borders.txt
-    public static AdjList [] adjListA  ; // adjacency list
+    public static AdjList [] adjListA  ; // adjacency list array
     public static int [][] distances = new int [NumDistances] [3]; //capdist.csv: country1, country2, distance
     public static int [] numA_Arr = new int [block]; // arr of "numA" in capdist
 
@@ -228,7 +228,7 @@ public class IRoadTrip {
                 i++; // where ; is
             } while ( !Character.isDigit( s.charAt( i ) ) );
             String t = s.substring( 0,i-1 );
-            x[n++] = search( t ); // n = number of neighbors
+            x[n++] = index( t ); // n = number of neighbors
             s = s.substring( i );
         }
         int [] y = new int [n];
@@ -252,24 +252,6 @@ public class IRoadTrip {
         }
         // returns state number as an int
         return( Integer.parseInt( stateNums[t][1] ) );
-    }
-
-
-    private static int search( String s ) {
-
-        int b,m,t;
-
-        b = 0;
-        t = countries.length-1;
-        while ( b < t ) {
-            m = ((b+t) >> 1);
-            if ( s.compareTo( countries[m] ) <= 0 ) {
-                t = m;
-            } else {
-                b = m+1;
-            }
-        }
-        return( (s.equals( countries[t] ) ? t : -1) );
     }
 
     /* SORT0(): uses bubble sort to sort the state names in stateNums[][] in alphabetical order. */
@@ -320,32 +302,48 @@ public class IRoadTrip {
         }
     }
 
-
-    // adjList array: the index corresponds to index of country in borders.txt.
-    // the entries are the index of the country's neighbor and their distance,
-    // and then a pointer to the next adjacent country.
-    public static class AdjList {
+    private static class gNode { // a single node
 
         /*-----------------------------------------------------------*/
-        /* private data members - AdjList			     */
+        /* private data members: gNode
         /*-----------------------------------------------------------*/
 
-        private gNode head, tail; // graph node
+        private int vrtx; // index in borders.txt
+        private int wght; // distance in cap dist
+        private gNode link; // a pointer to the next node
 
         /*-----------------------------------------------------------*/
-        /* constructor - AdjList				     */
+        /* constructor: gNode
         /*-----------------------------------------------------------*/
 
-        AdjList() {				// adjacency list
+        gNode( int v,int d ) {
+            vrtx = v;
+            wght = d;
+            link = null;
+        }
+    }
 
-            head = tail = null;
+    public static class AdjList { // a linked list of gNodes
+
+        /*-----------------------------------------------------------*/
+        /* private data members: AdjList
+        /*-----------------------------------------------------------*/
+
+        private gNode head, tail;
+
+        /*-----------------------------------------------------------*/
+        /* constructor: AdjList
+        /*-----------------------------------------------------------*/
+
+        AdjList() {
+            head = tail = null; // a linked list
         }
 
         /*-----------------------------------------------------------*/
-		/* private methods - AdjList				     *
-		/* put vertices into list in increasing order; display list  */
+		/* methods: AdjList
         /*-----------------------------------------------------------*/
 
+        /* ADD(): adds gnodes to an adjacency list increasing order by vertex */
         private void add( gNode q ) {
 
             if ( head == null ) {		// empty list?
@@ -368,73 +366,49 @@ public class IRoadTrip {
                 p = r;
                 r = r.link;
             }
-            p.link = q;			// p < q < r
+            p.link = q;
             q.link = r;
         }
 
         private gNode Head() {
-
             return( head );
         }
     }
 
-
-    private static class gNode {			// graph node
-
-        /*-----------------------------------------------------------*/
-        /* private data members - gNode				     */
-        /*-----------------------------------------------------------*/
-
-        private int vrtx; // index in borders.txt
-        private int wght; // distance in cap dist
-        private gNode link; // a pointer to the next node
+    private static class qNode {			// queue node, for Dijkstra's
 
         /*-----------------------------------------------------------*/
-        /* constructor - gNode					     */
+        /* private data members - qNode
         /*-----------------------------------------------------------*/
 
-        gNode( int v,int l ) {
-
-            vrtx = v;
-            wght = l;
-            link = null;
-        }
-    }
-
-    private static class qNode {			// queue node
-
-        /*-----------------------------------------------------------*/
-        /* private data members - qNode				     */
-        /*-----------------------------------------------------------*/
-
-        private qNode blink;
+        private qNode blink; // backwards link
         private int vrtx;
         private int dist;
-        private qNode flink;
+        private qNode flink; // forwards link
 
         /*-----------------------------------------------------------*/
-        /* constructor - qNode					     */
+        /* constructor - qNode
         /*-----------------------------------------------------------*/
 
-        qNode( int v,int l ) {
+        qNode( int v,int d ) {
 
             blink = flink = null;
             vrtx = v;
-            dist = l;
+            dist = d;
         }
     }
 
-    private static class Queue {
+    private static class Queue { // will be a doubly linked list
 
         /*-----------------------------------------------------------*/
-        /* private data members					     */
+        /* private data members: Queue
         /*-----------------------------------------------------------*/
 
         private qNode head;
         private qNode tail;
 
         /*-----------------------------------------------------------*/
-        /* constructor - Queue					     */
+        /* constructor: Queue
         /*-----------------------------------------------------------*/
 
         Queue() {
@@ -442,10 +416,11 @@ public class IRoadTrip {
         }
 
         /*-----------------------------------------------------------*/
-        /* methods - Queue: add, decrease, deleteMin, display,       */
-        /*    isNotDone, remove					     */
+        /* methods: Queue
         /*-----------------------------------------------------------*/
 
+        /* ADD(): adds qNodes to a doubly linked list, which will be the queue.
+        The qnode with the minimum distance will be in the front */
         private void add( qNode q ) {
 
             if ( tail == null ) {		// empty list?
@@ -470,11 +445,12 @@ public class IRoadTrip {
                 p = r;
                 r = r.flink;
             }
-            p.flink = r.blink = q;		// p < q < r
+            p.flink = r.blink = q;
             q.blink = p;
             q.flink = r;
         }
 
+        /* DECREASE(): update distance to every vertex adjacent to u, or country1 */
         private void decrease( int v,int newDist ) {
 
             qNode p = head;
@@ -482,15 +458,17 @@ public class IRoadTrip {
                 p = p.flink;
             }
             qNode q = new qNode( v,newDist );
+            // replace
             remove( p );
             add( q );
         }
 
+        /* DELETEMIN(): removes the first node from the queue */
         private int deleteMin() {
 
-            int u = head.vrtx;
+            int u = head.vrtx; // storing vertex of head
             head = head.flink;
-            if ( head == null ) {
+            if ( head == null ) { // removing node
                 tail = null;
             } else {
                 head.blink = null;
@@ -498,12 +476,13 @@ public class IRoadTrip {
             return( u );
         }
 
+        /* ISNOTDONE(): ensures the queue still holds neighbors  */
         private Boolean isNotDone() {
-
             return( (head != null ) &&
                     (head.dist != Integer.MAX_VALUE) );
         }
 
+        /* REMOVE(): removes a node from queue */
         private void remove( qNode p ) {
 
             if ( p == head ) {
@@ -522,18 +501,16 @@ public class IRoadTrip {
     public static class Trip {
 
         /*-----------------------------------------------------------*/
-        /* private data members - Trip				     */
+        /* private data members: Trip
         /*-----------------------------------------------------------*/
 
         public String [] country;
         public int [][] dist;
         public AdjList [] adjListA;
-        //public String [] line;
-        public int [] numaA;
-        //public String [][] snum;
+        public int [] numaA_Arr;
 
         /*-----------------------------------------------------------*/
-        /* constructor - Trip					     */
+        /* constructor: Trip
         /*-----------------------------------------------------------*/
 
         Trip( String [] a,int [][] b,AdjList [] c,
@@ -542,22 +519,17 @@ public class IRoadTrip {
             country = a;
             dist = b;
             adjListA = c;
-            //line = d;
-            numaA = e;
-            //snum = f;
+            numaA_Arr = e;
         }
 
 
         /*-----------------------------------------------------------*/
-        /* methods - Trip					     */
+        /* methods - Trip
         /*-----------------------------------------------------------*/
 
+        /* EXPLORE(): determine if a vertex is reachable from v */
         public void explore( int v,
                               Boolean [] visited ) {
-
-            // explore everything that is visible from v.
-            // mark everthing visitable from v true. then, if it is true the country
-            // desired is true, then it has a path.
 
             visited[v] = true;
             gNode p = adjListA[v].head;
@@ -569,6 +541,7 @@ public class IRoadTrip {
             }
         }
 
+        /* DISTANCE(): searches block in capdist to find distance between 2 ccountry */
         public int Distance(String country1, String country2 ) {
 
             int numa = num( country1 );
@@ -579,48 +552,53 @@ public class IRoadTrip {
 
             int b,m,t;
 
-            b = 0;					// find the block
-            t = 202;				//  for numa
-            while ( b < t ) {			//  using
-                m = ((b+t) >> 1);		//  indices[.][0]
-                if ( numa <= numaA[m] ) {
+            // first: find the block where country1 is
+            b = 0;
+            t = 202;
+            while ( b < t ) {
+                m = ((b+t) >> 1);
+                if ( numa <= numaA_Arr[m] ) {
                     t = m;
                 } else {
                     b = m+1;
                 }
             }
+
+            // determines when blocks start and end. block 64 is flawed, it is double the size of others
             b = (t <= 64 ? 202*t : 202*t+202);
             t = (t != 64 ? b+201 : b+403);
-            while ( b < t ) {			//  in that block
-                m = ((b+t) >> 1);		//  using
-                if ( numb <= dist[m][1] ) {	//  dist[.][1]
+
+            // second: find the line in the block where country2 is
+            while ( b < t ) {
+                m = ((b+t) >> 1);
+                if ( numb <= dist[m][1] ) {
                     t = m;
                 } else {
                     b = m+1;
                 }
             }
-            return( (dist[t][1] == numb ? dist[t][2] : -1) ); // -1 is
-            // impossible dist
+            return( (dist[t][1] == numb ? dist[t][2] : -1) );
         }
 
+        /* FINDMINPATHS(): implements Dijkstra's algorithm to find the shortest path between two vertices */
         public int [][] findMinPaths( int s ) {
 
-            int n = adjListA.length;
-            Integer [] dist = new Integer [n];
-            Integer [] prev = new Integer [n];
+            // dist[v] is the distance from s, starting vertex, to a vertex v
+            Integer [] dist = new Integer [NumCountries];
+            Integer [] prev = new Integer [NumCountries];
             Queue queue = new Queue();
-            for ( int v = 0;  v < n;  v++ ) {
-                // intializing
+            for ( int v = 0;  v < NumCountries;  v++ ) {
+                // initializing
                 dist[v] = Integer.MAX_VALUE;	// infinity
-                prev[v] = -1;			// "parent" of v
+                prev[v] = -1;
             }
-            dist[s] = 0; // every country is 0 km from itself
-            for ( int v = 0;  v < n;  v++ ) {
+            dist[s] = 0; // every vertex is 0 km from itself, front of the queue
+            for ( int v = 0;  v < NumCountries;  v++ ) {
                 queue.add( new qNode( v,dist[v] ) );
             }
             while ( queue.isNotDone() ) {
-                // dijkstras
                 int u = queue.deleteMin();
+                // search through every vertex v which is adjacent to u
                 for ( gNode p = adjListA[u].Head();  p != null;  p = p.link ) {
                     int v = p.vrtx;
                     int newDist = dist[u]+p.wght;
@@ -631,14 +609,16 @@ public class IRoadTrip {
                     }
                 }
             }
-            int [][] minPath = new int [n][n];
-            for ( int v = 0;  v < n;  v++ ) {
+            int [][] minPath = new int [NumCountries][NumCountries];
+            for ( int v = 0;  v < NumCountries;  v++ ) {
                 minPath[v][0] = dist[v];
                 minPath[v][1] = prev[v];
             }
+            // array with minimum path is returned
             return( minPath );
         }
 
+        /* FINDPATH(): calls findMinPaths to find the minimum path between two countries */
         public List<String> findPath( String country1,String country2 ) {
 
             List<String> y = new ArrayList<>();
@@ -657,7 +637,7 @@ public class IRoadTrip {
             int [] path = new int [country.length];
             path[0] = v1;
             int i = v1;
-            do {
+            do { // unwinding the previous array from findMinPaths to retrieve actual path
                 i = minPath[i][1];
                 path[++l] = i;
             } while ( i != v0 );
@@ -665,12 +645,14 @@ public class IRoadTrip {
                 String c0 = country[path[j]];
                 String c1 = country[path[j-1]];
                 int d = Distance( c0,c1 );
+                // creating array of output
                 String t = "* "+c0+" --> "+c1+" ("+d+" km.)";
                 y.add( t );
             }
             return( y );
         }
 
+        /* NOPATH(): checks to see if there is a path between two vertices */
         private Boolean noPath( int v0,int v1,AdjList [] adjListA ) {
 
             int n = adjListA.length;
