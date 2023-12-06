@@ -1,29 +1,33 @@
+/* ------------------------------------------------------------------------ */
+/* IROADTRIP.JAVA: analyzes borders.txt, state_num.tsv, and capdist.csv     */
+/* to get border information on 253 countries. This program uses Dijkstra's */
+/* shortest path algorithm to find the shortest path when embarking on an   */
+/* "international road trip".                                               */
+/* README.md is available on github.                                        */
+/* ------------------------------------------------------------------------ */
+
 import java.util.*;
 import java.io.*;
 
 public class IRoadTrip {
-
     /*-------------------------------------------------------------------*/
     /* global variables
     /*-------------------------------------------------------------------*/
-    static final int NumCountries = 253; // num of countries in borders.txt
-    static final int NumStates = 216;    // num of countries in state_name.tsv
-    static final int NumDistances = 41006;        // num of recorded distances in capdist.csv
-    static final int block = 202 ; // size of blocks in capdist.csv
-
+    static final int NumCountries = 253;    // num of countries in borders.txt
+    static final int NumStates = 216;       // num of countries in state_name.tsv
+    static final int NumDistances = 41006;  // num of recorded distances in capdist.csv
+    static final int block = 202 ;          // size of blocks in capdist.csv
     public static String [] countries = new String [NumCountries];	// country names
     final private static String [][] stateNums = new String [NumStates][2];	// state name, state number
-    public static String [] line0 = new String [NumCountries];	// line from file0, borders.txt
-    public static AdjList [] adjListA  ; // adjacency list array
+    public static String [] line0 = new String [NumCountries];	// a line from file0, borders.txt
+    public static AdjList [] adjListA  ;    // adjacency list array
     public static int [][] distances = new int [NumDistances] [3]; //capdist.csv: country1, country2, distance
     public static int [] numA_Arr = new int [block]; // arr of "numA" in capdist
 
     public static void main(String[] args) {
         IRoadTrip a3 = new IRoadTrip(args);
-        findPath("United States", "Russia");
-        System.out.println(getDistance("United States", "Canada"));
+        System.out.println(a3.findPath("Colombia", "Argentina"));
         //a3.acceptUserInput();
-
     }
 
     public IRoadTrip (String [] args) {
@@ -57,7 +61,7 @@ public class IRoadTrip {
         execute() ;
     }
 
-    /* EXECUTE(): Method called by IRoadTrip constructor. The array of adjacency lists is constructed here. */
+    /* EXECUTE(): method called by IRoadTrip constructor. The array of adjacency lists is constructed here. */
     public void execute(){
 
         sort0();    // stateNums[][] is sorted
@@ -71,7 +75,7 @@ public class IRoadTrip {
             if ( nabor[0] != -2 ) { // if there is a neighbor
 
                 // for every neighboring country in borders.txt, ensure the country exists in state_name.
-                // if so, add the new gnode (graph node) to the adjacency list
+                // if so, add the new gNode (graph node) to the adjacency list
                 for (int x : nabor) {
                     int y = findDistance(countries[i], countries[x], numA_Arr, distances);
                     if (y != -1) { // distance exists
@@ -81,14 +85,18 @@ public class IRoadTrip {
             }
         }
     }
+
+    /* GETDISTANCE(): returns the distance between two countries with land borders, if exists. */
     public static int getDistance (String country1, String country2) {
         Trip t = new Trip( countries, distances, adjListA, numA_Arr) ;
-
-       int c1 = index(country1) ;
-       int c2 = index(country2) ;
-       gNode p = adjListA[c1].head ;
+       int num1 = index(country1) ;
+       int num2 = index(country2) ;
+       if (num1 < 0 || num2 < 0){
+           return (-1) ;
+       }
+       gNode p = adjListA[num1].head ;
        while(p != null){
-           if(p.vrtx == c2){
+           if(p.vrtx == num2){
                return(t.Distance(country1,country2)) ;
            }
            p = p.link ;
@@ -96,20 +104,16 @@ public class IRoadTrip {
        return(-1) ;
     }
 
-
+    /* FINDPATH(): finds the shortest path between two countries and returns in List form */
     public static List<String> findPath (String country1, String country2) {
         Trip t = new Trip( countries, distances, adjListA, numA_Arr) ;
 
-        List<String> roadPath = t.findPath( country1,country2 );
-        //System.out.println( "Route from "+country1+" to "+country2+":" );
-        System.out.println( "Route from "+country1+" to "+country2+":" );
-        for (String s : roadPath) {
-            System.out.println(s);
-        }
-        return t.findPath(country1, country2) ;
+        List<String> roadPath = t.path( country1,country2 );
+        return (roadPath) ;
     }
 
 
+    /* ACCEPTUSERINPUT(): allows user to find the shortest path between countries */
     public void acceptUserInput() {
         Trip trip = new Trip( countries,distances,adjListA,numA_Arr);
         Scanner kbd = new Scanner( System.in );
@@ -127,14 +131,14 @@ public class IRoadTrip {
             if ( y.equals( "EXIT" ) ) {
                 break;
             }
-            int ix = index( x ); // index of the country 1 in countries[]
+            int ix = index( x );
             int iy = index( y );
             if ( (ix < 0) || (iy < 0) || (ix == iy) ) { // country was the same or does not exist
                 System.out.println( "Invalid country name. "+
                         "Please enter a valid country name." );
                 continue;
             }
-            List<String> roadPath = trip.findPath( x,y );
+            List<String> roadPath = trip.path( x,y );
             System.out.println( "Route from "+x+" to "+y+":" );
             for (String s : roadPath) {
                 System.out.println(s);
@@ -143,7 +147,7 @@ public class IRoadTrip {
         kbd.close();
     }
 
-    /* findDistance(): find the distance between two countries in the distance array using binary search. */
+    /* FINDDISTANCE(): find the distance between two countries in the distance array using binary search. */
     private static int findDistance(String country1, String country2,int [] numaA,int [][] dist ) {
         int b,m,t;
 
@@ -209,7 +213,7 @@ public class IRoadTrip {
         return( (name.equals( countries[t] ) ? t : -1) );
     }
 
-    /* NEXTTO(): returns array of countries adjacent s, using borders.txt. */
+    /* NEXTTO(): returns array of countries adjacent to s, using borders.txt. */
     private static int [] nextTo( String s ) {
 
         // replacing all '=' with ';'
@@ -262,10 +266,12 @@ public class IRoadTrip {
             for ( int j = 0;  j < n-i;  j++ ) {
                 // if s1.compareTo(s2) is negative, s1 should proceed s2 alphabetically
                 if ( IRoadTrip.stateNums[j+1][0].compareTo( IRoadTrip.stateNums[j][0] ) < 0  ) {
+
                     // first: swap strings in column 0, which is the state name
                     String s = IRoadTrip.stateNums[j][0];
                     IRoadTrip.stateNums[j][0] = IRoadTrip.stateNums[j+1][0];
                     IRoadTrip.stateNums[j+1][0]= s;
+
                     // second: swap strings in column 1, which is the state number
                     s = IRoadTrip.stateNums[j][1];
                     IRoadTrip.stateNums[j][1] = IRoadTrip.stateNums[j+1][1];
@@ -275,7 +281,7 @@ public class IRoadTrip {
         }
     }
 
-    /* SORT1(): uses bubble sort to sort each block in the distances[][], keying on numb. */
+    /* SORT1(): uses bubble sort to sort each block in the distances[][], keying on numB. */
     private static void sort1() {
         int beginBlock,endBlock,i,j,k,x;
 
@@ -288,10 +294,12 @@ public class IRoadTrip {
                 for ( k = 0;  k < b-a+1-j;  k++ ) {
                     // reminder: we are in a block, so column 0 (numa) will be the same
                     if ( distances[a+k+1][1] < distances[a+k][1] ) {
+
                         // first: swap numb (country 2)
                         x = distances[a+k][1];
                         distances[a+k][1] = distances[a+k+1][1];
                         distances[a+k+1][1] = x;
+
                         // second: swap distance
                         x = distances[a+k][2];
                         distances[a+k][2] = distances[a+k+1][2];
@@ -302,7 +310,7 @@ public class IRoadTrip {
         }
     }
 
-    private static class gNode { // a single node
+    private static class gNode { // a single node, graph node
 
         /*-----------------------------------------------------------*/
         /* private data members: gNode
@@ -541,7 +549,7 @@ public class IRoadTrip {
             }
         }
 
-        /* DISTANCE(): searches block in capdist to find distance between 2 ccountry */
+        /* DISTANCE(): searches block in capdist to find distance between 2 countries */
         public int Distance(String country1, String country2 ) {
 
             int numa = num( country1 );
@@ -618,8 +626,8 @@ public class IRoadTrip {
             return( minPath );
         }
 
-        /* FINDPATH(): calls findMinPaths to find the minimum path between two countries */
-        public List<String> findPath( String country1,String country2 ) {
+        /* PATH(): calls findMinPaths to find the minimum path between two countries */
+        public List<String> path( String country1,String country2 ) {
 
             List<String> y = new ArrayList<>();
             int v0 = index( country1 );
@@ -667,6 +675,7 @@ public class IRoadTrip {
     /* DOFILE0: processes border.txt file and fills in country[] */
     private static void doFile0( Scanner sc,String [] line,String [] country ) {
 
+        // edited border.txt
         String [] newFile = {
                 "Afghanistan = China 91 km; Iran 921 km; Pakistan 2,670 km; Tajikistan 1,357 km; Turkmenistan 804 km; Uzbekistan 144 km",
                 "Akrotiri = Cyprus 48 km",
@@ -939,6 +948,7 @@ public class IRoadTrip {
     /* DOFILE1: processes state_name.tsv and fills in stateNums[][] */
     private static void doFile1( Scanner sc ) {
 
+        // edited state_name.tsv
         String [] newFile = {
                 "statenumber	stateid	countryname	start	end",
                 "2	USA	United States	1816-01-01	2020-12-31",
