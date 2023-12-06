@@ -2,11 +2,13 @@
 
 This is a program written in Java which finds the shortest path to get from one country to another. Dijkastra's algorithm was utilized in order to find this minimum path. The findMinPath() method in this program was inspired by the implementation of Dijkastra's algorithm in the book "Algorithms", by Sanjoy Dasgupta, Christos Papadimitriou, and Umesh Vazirani. 
 
+# This program is split into 3 parts: processing the files, creating the adjacency list, and finding the shortest path using Dijkastra's algorithm. 
+
 This program requires 3 files: borders.txt, state_name.tsv, and capdist.csv. 
 
-Borders.txt is a text file which lists 253 countries and their bordering countries in a semicolon seperated list. It is in alphabetical order, beginning with Afghanistan and ending in Zimbabwe. 
+Borders.txt is a text file which lists 253 countries and their bordering countries in a semicolon seperated list. It is in alphabetical order, beginning with Afghanistan and ending in Zimbabwe. Some of the countries on the right side of the '=' sign, or the bording countries, do not show up on the left of an '=' sign, such as French Guiana. French Guiana appears to be a bordering country to Suriname and Brazil. However, French Guiana is never referenced later on as its own country in the same file. 
 
-State_name.tsv is a TSV file which includes the country names of 216 countries, their corresponding state number, and their state ID. (More information is included but this is the relevant information). It is in numerical order by state number. 
+State_name.tsv is a TSV file which includes the country names of 216 countries, their corresponding state number, and their state ID. (More information is included but this is the relevant information). It is in numerical order by state number. Some of the country names in this file are not the same as the country names in Borders.txt. 
 
 Capdist.csv is a 41006 line CSV file. It includes 203 countries, denoted by their country number and country ID (but no country name). Each country included has a "block" which is 202 in size. Except for the block for state number 345, which includes information about Yugoslavia and Serbia, making it double the size of the other blocks. Each block also has the state ID and state number of the other 202 countries and their distance in km. The blocks are in numerical order by state number. The blocks themselves are not ordered. 
 
@@ -67,7 +69,7 @@ add(): This method adds qNodes to a doubly linked list, which will be the queue.
 
 remove(): This method removes a qNode from a queue. 
 
-decrease(): Called by findMinPath(). This method updates the distance to every vertex adjacent to "u". Because all of the vertexes in findMinPath() are intialized to infinity, any valid neighbor will "decrease" in distance when their real distance is updated in the queue. 
+decrease(): Called by findMinPath(). This method updates the distance to every vertex adjacent to "u". Because all of the distances in findMinPath() are intialized to infinity, any valid neighbor will "decrease" in distance when their real distance is updated in the queue, as well as its position in the queue. 
 
 deleteMin(): Called by findMinPath(). The node with the minimum distance is always stored at the front of the queue. So, this method removes the first node from the queue, but stores the vertex of the head node.
 
@@ -80,9 +82,9 @@ noPath(): This method checks to see if there is a path between two vertices. It 
 
 explore(): This is a recursive function that checks to see if a vertex can be reached by another vertex. 
 
-path(): Calls the findMinPath() function, and returns the minimum path between two countries in an Array List of strings. If the vertex of country1 or country2 is invalid, an empty list is returned (as well as if there is no path). Otherwise, the path() method "unwinds" the array returned by findMinPaths. Afterwards, the true minimum path from country1 -> country2 is found and it can be added to the Array List. 
+path(): Calls the findMinPath() function, and returns the minimum path between two countries in an Array List of strings. If the vertex of country1 or country2 is invalid, an empty list is returned (as well as if there is no path). Otherwise, the path() method "unwinds" the array returned by findMinPaths (prev[]). Afterwards, the true minimum path from country1 -> country2 is found and it can be added to the Array List. 
 
-findMinPaths(): This method implements Dijkstra's algorithm to find the shortest path between two vertices. An array is created, where dist[v] will represent the shortest path from vertex s to vertex v. The entire array is intialized to infinity, so every vertex at this point is an infinte distance away from s. However, dist[s] is 0, because a vertex is always 0 _ away from itself. Thus, this will automatically make this node at the front of the queue. 
+findMinPaths(): This method implements Dijkstra's algorithm to find the shortest path between two vertices. An array is created, where dist[v] will represent the shortest path from vertex s to vertex v. Every dist[v] is intialized to infinity, so every vertex at this point is an infinte distance away from s. However, dist[s] is 0, because a vertex is always 0 _ away from itself. Thus, this will automatically make this node at the front of the queue. 
   An int u will be used to represent the vertex which was previously the min, and we add this node's weight to an int newDist. In the beginning, it will be 0. Next, we search through every vertex v which is adjacent to u and repeat this process. If we find a new distance which is shorter than dist[v], we update dist[v]. At the end, we return an array with the minimum path. 
 
 Distance(): This method searches a block in the distance array (from capdist.csv) to find the distance between two countries. It uses a binary search to first find the block wehre country1 lives, and then to find the line in the block where country2 lives. Then, the third column, which has the distance in km, is returned (if exists). 
