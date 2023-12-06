@@ -20,8 +20,8 @@ public class IRoadTrip {
 
     public static void main(String[] args) {
         IRoadTrip a3 = new IRoadTrip(args);
-        a3.findPath("Colombia", "Peru") ;
-       // System.out.println()) ;
+        findPath("United States", "Russia");
+        System.out.println(getDistance("United States", "Canada"));
         //a3.acceptUserInput();
 
     }
@@ -97,10 +97,11 @@ public class IRoadTrip {
     }
 
 
-    public List<String> findPath (String country1, String country2) {
+    public static List<String> findPath (String country1, String country2) {
         Trip t = new Trip( countries, distances, adjListA, numA_Arr) ;
 
         List<String> roadPath = t.findPath( country1,country2 );
+        //System.out.println( "Route from "+country1+" to "+country2+":" );
         System.out.println( "Route from "+country1+" to "+country2+":" );
         for (String s : roadPath) {
             System.out.println(s);
@@ -142,42 +143,46 @@ public class IRoadTrip {
         kbd.close();
     }
 
-    /* FIND(): find the distance between two countries in the distance array using binary search. */
+    /* findDistance(): find the distance between two countries in the distance array using binary search. */
     private static int findDistance(String country1, String country2,int [] numaA,int [][] dist ) {
         int b,m,t;
 
+        // get state number
         int num1 = num( country1 );
         int num2 = num( country2 );
         if ( num1 == num2 ) { // same country
             return( 0 );
         }
 
-        b = 0;					// find the block
-        t = 202;				//  for numa
-        while ( b < t ) {			//  using
-            m = ((b+t)/2);		//  formulas
-            if ( num1 <= numaA[m] ) { // binary search
-                t = m;
-            } else {
-                b = m+1;
-            }
-        } // b and t is the block where country 2 lies
-        // first 63 blocks are 202 in size. but, 64th block is different
-        b = (t <= 64 ? 202*t : 202*t+202);
-        t = (t != 64 ? b+201 : b+403);
-        while ( b < t ) {			//  find the country in that block
-            m = ((b+t)/2);		//  using
-            if ( num2 <= dist[m][1] ) {	//  dist[.][1]
+        // first: find the block where country1 is
+        b = 0;
+        t = 202;
+        while ( b < t ) {
+            m = ((b+t)/2);
+            if ( num1 <= numaA[m] ) {
                 t = m;
             } else {
                 b = m+1;
             }
         }
-        return( (dist[t][1] == num2 ? dist[t][2] : -1) ); // -1 is
-        // make sure its the right country in dist. then, return the dist.
-        // dist[0] == country1 , dist[1] == country 2, dist[2] == distance between them
+
+        // determines when blocks start and end. block 64 is flawed, it is double the size of others
+        b = (t <= 64 ? 202*t : 202*t+202);
+        t = (t != 64 ? b+201 : b+403);
+
+        // second: find the line in the block where country2 is
+        while ( b < t ) {
+            m = ((b+t)/2);
+            if ( num2 <= dist[m][1] ) {
+                t = m;
+            } else {
+                b = m+1;
+            }
+        }
+        return( (dist[t][1] == num2 ? dist[t][2] : -1) );
     }
 
+    /* GETNAME1(): finding the country name in file1 (state_name.tsv). */
     private static String getname1( String s ) {
 
         s = s.substring( s.indexOf( '\t' )+1 ); // delete first tab
@@ -187,10 +192,8 @@ public class IRoadTrip {
         return( s );
     }
 
+    /* INDEX(): finds index of a country in borders.txt. */
     private static int index( String name ) {
-
-        // binary search in the arrays of country name
-
         int b,m,t;
 
         b = 0;
@@ -206,10 +209,12 @@ public class IRoadTrip {
         return( (name.equals( countries[t] ) ? t : -1) );
     }
 
+    /* NEXTTO(): returns array of countries adjacent s, using borders.txt. */
     private static int [] nextTo( String s ) {
 
+        // replacing all '=' with ';'
         s = s.replace( '=',';' );
-        if ( s.length() == s.indexOf( ';' )+2 ) {
+        if ( s.length() == s.indexOf( ';' ) + 2 ) {
             int [] y = new int [1];
             y[0] = -2;			// no neighbor
             return( y );
@@ -220,10 +225,10 @@ public class IRoadTrip {
             s = s.substring( s.indexOf( ';' )+2 );
             int i = -1;
             do {
-                i++;
+                i++; // where ; is
             } while ( !Character.isDigit( s.charAt( i ) ) );
             String t = s.substring( 0,i-1 );
-            x[n++] = search( t );
+            x[n++] = search( t ); // n = number of neighbors
             s = s.substring( i );
         }
         int [] y = new int [n];
@@ -639,6 +644,10 @@ public class IRoadTrip {
             List<String> y = new ArrayList<>();
             int v0 = index( country1 );
             int v1 = index( country2 );
+            if (v0 < 0 || v1 < 0 ){
+                y.add("") ;
+                return(y) ;
+            }
             if ( noPath( v0,v1,adjListA ) ) {
                 y.add( "" );
                 return( y );
