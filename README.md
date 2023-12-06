@@ -10,7 +10,7 @@ State_name.tsv is a TSV file which includes the country names of 216 countries, 
 
 Capdist.csv is a 41006 line CSV file. It includes 203 countries, denoted by their country number and country ID (but no country name). Each country included has a "block" which is 202 in size. Except for the block for state number 345, which includes information about Yugoslavia and Serbia, making it double the size of the other blocks. Each block also has the state ID and state number of the other 202 countries and their distance in km. The blocks are in numerical order by state number. The blocks themselves are not ordered. 
 
-This program's length is attributed to the cleanup of these files. 
+This program's length is attributed to the cleanup of these files. Another way to store the data could have been through a hashmap, which would hold the country name as the key, and the country number as the value. I chose to use the multidimensional array because I figured the TSV and CSV files look like what I imagine multidimensional arrays look like. 
 
 # IRoadTrip Class / Methods
 The constructor in IRoadTrip is responsible for reading in the three files and processing them. 
