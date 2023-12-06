@@ -26,7 +26,6 @@ public class IRoadTrip {
 
     public static void main(String[] args) {
         IRoadTrip a3 = new IRoadTrip(args);
-        System.out.println(a3.findPath("Colombia", "Argentina"));
         a3.acceptUserInput();
     }
 
@@ -141,7 +140,9 @@ public class IRoadTrip {
             List<String> roadPath = trip.path( x,y );
             System.out.println( "Route from "+x+" to "+y+":" );
             for (String s : roadPath) {
-                System.out.print(" * ") ;
+                if (!roadPath.contains("")){
+                    System.out.print(" * ") ;
+                }
                 System.out.println(s);
             }
         }
