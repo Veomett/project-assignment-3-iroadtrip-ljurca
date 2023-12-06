@@ -315,7 +315,7 @@ public class IRoadTrip {
     private static class gNode { // a single node, graph node
 
         /*-----------------------------------------------------------*/
-        /* private data members: gNode
+        /* data members: gNode
         /*-----------------------------------------------------------*/
 
         private int vrtx; // index in borders.txt
@@ -336,7 +336,7 @@ public class IRoadTrip {
     public static class AdjList { // a linked list of gNodes
 
         /*-----------------------------------------------------------*/
-        /* private data members: AdjList
+        /* data members: AdjList
         /*-----------------------------------------------------------*/
 
         private gNode head, tail;
@@ -388,7 +388,7 @@ public class IRoadTrip {
     private static class qNode {			// queue node, for Dijkstra's
 
         /*-----------------------------------------------------------*/
-        /* private data members - qNode
+        /* data members - qNode
         /*-----------------------------------------------------------*/
 
         private qNode blink; // backwards link
@@ -411,7 +411,7 @@ public class IRoadTrip {
     private static class Queue { // will be a doubly linked list
 
         /*-----------------------------------------------------------*/
-        /* private data members: Queue
+        /* data members: Queue
         /*-----------------------------------------------------------*/
 
         private qNode head;
@@ -511,7 +511,7 @@ public class IRoadTrip {
     public static class Trip {
 
         /*-----------------------------------------------------------*/
-        /* private data members: Trip
+        /* data members: Trip
         /*-----------------------------------------------------------*/
 
         public String [] country;
