@@ -68,7 +68,7 @@ public class IRoadTrip {
 
         adjListA = new AdjList [NumCountries];
         for ( int i = 0;  i < NumCountries;  i++ ) {
-            int [] nabor = nextTo( line0[i] ); // indexes of neighboring countries in border.txt
+            int [] nabor = nextTo( line0[i] ); // indexes of neighboring countries in borders.txt
             adjListA[i] = new AdjList();
 
             if ( nabor[0] != -2 ) { // if there is a neighbor
